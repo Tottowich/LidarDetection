@@ -10,13 +10,13 @@ This part of the project was developed by Theodor Jonsson, Umeå University, Swe
 This does not include [train.py](train.py), [val.py](val.py), [export.py](export.py), [hubconf.py](hubconf.py), models/* and utils/.
 Exception: modifications to [utils/dataloaders.py](utils/dataloaders.py). Specifically LoadImages to handle multiple directories as input.
 
-But including all code in [OusterTesting](https://github.com/adopticum/oustertesting.git)
+But including all code in the [OusterTesting](https://github.com/adopticum/oustertesting.git) repository.
 
 ## Problem description
 The problem needed to be solved was to detect the 3D positions and dimensions of each person surrounding the center of the so called playing field. 
 The final design of the playing field:
 <p align="center">
-  <img src="images/field.png" alt="drawing" width="300">
+  <img src="images/field.png" alt="drawing" width="400">
 </p>
 The white dot in the center represent the lidar sensor provided by Ouster, specifically Ouster OS0-128.
 
@@ -24,7 +24,7 @@ The white dot in the center represent the lidar sensor provided by Ouster, speci
 This sensor is a high definition lidar sensor with 128 azimuth lasers rotating at 1200 rpm. At each rotaion the sensor collects 128 datapoints at 1024 different angles. The sensor is capable of collecting over 2 million data points per second. A typical point cloud from the sensor an OS0 sensor looks like this:
 <!-- Center Image -->
 <p align="center">
-  <img src="images/pc.png" alt="drawing" width="300">
+  <img src="images/pc.png" alt="drawing" width="500">
 </p>
 
 This image was taken from the [OS0-64](https://ouster.com/products/scanning-lidar/os0-sensor/) sensor with 64 azimuth lasers.
@@ -37,7 +37,7 @@ The second approach was to construct an image from the sensor generated data and
 <p align="center">
   <img src="images/image_2.jpg" alt="drawing" width="600">
 </p>
-In the images constructed by the sensor each instead of having a typicall RGB or BGR image the channels of the image are constructing using different data from the sensor. The image above is constructed using the following channels:
+The images constructed by the sensor are not typicall RGB or BGR images but images with 3 channels containing 3 different types of information metrics for each point gathered by the sensor. The image above is constructed using the following channels:
 
 * Channel 0: Signal - Represents the number of photons collected by the sensor at each point.
 * Channel 1: Reflectivity - Represents the reflectivity of the object at each point.
@@ -45,12 +45,14 @@ In the images constructed by the sensor each instead of having a typicall RGB or
 
 Read more about the various channels [here](https://ouster.com/blog/firmware-2-1-1-better-perception-performance-with-improved-reflectivity-and-signal-multiplier-mode/).
 ## Ouster Code
-To help with recording data, play back sequences of data in python and to visualize the point clouds using [Open3D](http://www.open3d.org/) we created a extension of the [Ouster-SDK](https://pypi.org/project/ouster-sdk/) available at [Adopticums](https://www.adopticum.se/sv-SE) [github](https://github.com/adopticum/OusterTesting). This code is used to collect the data used in this project.
+To help with recording data, play back sequences of data in python and to visualize the point clouds using [Open3D](http://www.open3d.org/) we created a extension of the [Ouster-SDK](https://pypi.org/project/ouster-sdk/) available at [Adopticums's](https://www.adopticum.se/sv-SE) [github](https://github.com/adopticum/OusterTesting). This code is used to collect the data used in this project. The repository also contains functions to contruct the image representations of the sensor data. These images has the dimensions 128x1024x3 when using the channels described above. The code also contains classes to visualize the point clouds using [Open3D](http://www.open3d.org/) along side 3D bounding boxes at real time.
 ## Data collection
 The data was collected in on the streets of Skellefteå, Sweden and at [North Kingdoms](https://www.northkingdom.com) offices in Skellefteå and is available on [Roboflow](https://app.roboflow.com/lidarimages-9xnln/xr-synthesize-srr/6).
+
 ## Training
 The training was done using [YoloV5](https://github.com/ultralytics/yolov5) and the training script provided via their repository.
-The first training was done using the following the 6th version of the roboflow dataset and further fintuned on the 7th version where additional data of people in wheelchairs was added. The training was done on a Nvidia RTX 3090 GPU and took roughly 3 hours to train the first part and an additional 2 hours to train the second part. The hyper parameters used to train the model are available under [data/hyps/hyp.scratch-low.yaml](data/hyps/hyp.scratch-low.yaml) for the first part and [data/hyps/hyp.finetune-frozen.yaml](data/hyps/hyp.finetune-frozen.yaml) for the second part.
+The first training was done using the following the 6th version of the roboflow dataset and further fintuned on the 7th version where additional data of people in wheelchairs was added. The training was done on a Nvidia RTX 3090 GPU and took roughly 3 hours to train the first part and an additional 2 hours to train the second part. The hyper parameters used to train the model are available under [data/hyps/hyp.scratch-low.yaml](data/hyps/hyp.scratch-low.yaml) for the first part and [data/hyps/hyp.finetune-frozen.yaml](data/hyps/hyp.finetune-frozen.yaml) for the second part. To see the results of training the different models see my [wandb](https://wandb.ai/totto/YOLOR?workspace=user-totto).
+
 ## 2D to 3D
 Since using a 2D detection models only creates a 2D bounding box around each person, we need to find a way to convert the 2D bounding box to a 3D bounding box using the depth map of the image, i.e. channel 2. To project the 2D detection into 3D some assumtions had to be made. The assumtions are:
 * All people are equally deep as seen from the sensor. Some information is lost here but it is a good enough assumtion for the purpose of this project. All people are instead assumed to be 0.5 meters deep, see [HARD_WIDTH](tools/xr_synth_utils.py) where it is easily altered.
@@ -65,7 +67,7 @@ $$y^{(i)} = \sin{(\frac{y1+y2}{2})}*d$$
 
 Where $w^{(i)}$ and $h^{(i)}$ are the width and height of the 3D bounding box, $x^{(i)}$ and $y^{(i)}$ are the x and y coordinates of the center of the 3D bounding box, $x_0^{(i)}$ and $x_1^{(i)}$ are the x coordinates of the top left and bottom right corners of the 2D bounding box, $y_0^{(i)}$ and $y_1^{(i)}$ are the y coordinates of the top left and bottom right corners of the 2D bounding box, $W$ is the width of the image, $H$ is the height of the image and $d$ is the distance from the sensor to the center person. These formulas are then applied to all predictions from the 2D detection model.
 
-For calculations of $z^{(i)}$ aswell as how the distance was determined see [proj_alt2](tools/xr_synth_utils.py). In short the distance is determined by finding a low percentage quantile of depth map. This is done to remove outliers and to get a more accurate distance. The distance is then used to calculate the z coordinate of the center of the 3D bounding box.
+For calculations of $z^{(i)}$ aswell as how the distance was determined see [proj_alt2](tools/xr_synth_utils.py) in [tools/xr_synth_utils.py](tools/xr_synth_utils.py). In short the distance is determined by finding a low percentage quantile of depth map. This is done to remove outliers and to get a more accurate distance. The distance is then used to calculate the z coordinate of the center of the 3D bounding box.
 ## Results
 A video of the results:
 <p align="center">
