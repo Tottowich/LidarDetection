@@ -12,10 +12,8 @@ evolve/
 best_weights/
 datasets/
 *.zip
-*.jpg
 !images/*.jpg
 *.jpeg
-*.png
 !images/*.png
 *.bmp
 *.tif
