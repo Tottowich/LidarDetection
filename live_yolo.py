@@ -372,7 +372,7 @@ Best Results:
     
     Using SRR.
 
-- []: Train image segmentation model for the SRR image representation giving image segmentation in point cloud as return.
+TODO: Train image segmentation model for the SRR image representation giving image segmentation in point cloud as return.
         Note:
             This could be done at a bounding box lebel but this would be slower but far easier. Training data easier to create.
 
