@@ -60,10 +60,10 @@ Since using a 2D detection models only creates a 2D bounding box around each per
 
 Given these assumtions we can project the 2D bounding box into 3D by using the following formula:
 
-$$w^{(i)} = \frac{x_1^{(i)}-x_0^{(i)}}{W}*2d\pi$$
-$$h^{(i)} = \frac{y_1^{(i)}-y_0^{(i)}}{H}*2d\pi$$
-$$x^{(i)} = \cos{(\frac{x1+x2}{2})}*d$$
-$$y^{(i)} = \sin{(\frac{y1+y2}{2})}*d$$
+$$w^{(i)} = \frac{u_1^{(i)}-u_0^{(i)}}{W}*2d\pi$$
+$$h^{(i)} = \frac{v_1^{(i)}-v_0^{(i)}}{H}*2d\pi$$
+$$x^{(i)} = \cos{(\frac{u_1+u_0}{2})}*d$$
+$$y^{(i)} = \sin{(\frac{u_1+u_0}{2})}*d$$
 
 Where $w^{(i)}$ and $h^{(i)}$ are the width and height of the 3D bounding box, $x^{(i)}$ and $y^{(i)}$ are the x and y coordinates of the center of the 3D bounding box, $x_0^{(i)}$ and $x_1^{(i)}$ are the x coordinates of the top left and bottom right corners of the 2D bounding box, $y_0^{(i)}$ and $y_1^{(i)}$ are the y coordinates of the top left and bottom right corners of the 2D bounding box, $W$ is the width of the image, $H$ is the height of the image and $d$ is the distance from the sensor to the center person. These formulas are then applied to all predictions from the 2D detection model.
 
