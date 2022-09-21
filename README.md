@@ -61,11 +61,11 @@ Since using a 2D detection models only creates a 2D bounding box around each per
 Given these assumtions we can project the 2D bounding box into 3D by using the following formula:
 
 $$w^{(i)} = \frac{u_1^{(i)}-u_0^{(i)}}{W}*2d\pi$$
-$$h^{(i)} = \frac{v_1^{(i)}-v_0^{(i)}}{H}*2d\pi$$
+$$h^{(i)} = \frac{v_1^{(i)}-v_0^{(i)}}{H}*2*\tan{\frac{a}{2}}*d\pi$$
 $$x^{(i)} = \cos{(\frac{u_1+u_0}{2})}*d$$
 $$y^{(i)} = \sin{(\frac{u_1+u_0}{2})}*d$$
 
-Where $w^{(i)}$ and $h^{(i)}$ are the width and height of the 3D bounding box, $x^{(i)}$ and $y^{(i)}$ are the x and y coordinates of the center of the 3D bounding box, $x_0^{(i)}$ and $x_1^{(i)}$ are the x coordinates of the top left and bottom right corners of the 2D bounding box, $y_0^{(i)}$ and $y_1^{(i)}$ are the y coordinates of the top left and bottom right corners of the 2D bounding box, $W$ is the width of the image, $H$ is the height of the image and $d$ is the distance from the sensor to the center person. These formulas are then applied to all predictions from the 2D detection model.
+Where $w^{(i)}$ and $h^{(i)}$ are the width and height of the 3D bounding box, $x^{(i)}$ and $y^{(i)}$ are the x and y coordinates of the center of the 3D bounding box, $u_0^{(i)}$ and $u_1^{(i)}$ are the x coordinates of the top left and bottom right corners of the $i^{th}$ 2D bounding box in the image, $v_0^{(i)}$ and $v_1^{(i)}$ are the y coordinates of the top left and bottom right corners of the $i^{th}$ 2D bounding box, $W$ is the width of the image the predictions were made in, $H$ is the height of the image. $d$ is the veritcal distance from the sensor to the center person. These formulas are then applied to all predictions from the 2D detection model.
 
 For calculations of $z^{(i)}$ aswell as how the distance was determined see [proj_alt2](tools/xr_synth_utils.py) in [tools/xr_synth_utils.py](tools/xr_synth_utils.py). In short the distance is determined by finding a low percentage quantile of depth map. This is done to remove outliers and to get a more accurate distance. The distance is then used to calculate the z coordinate of the center of the 3D bounding box.
 ## Results
